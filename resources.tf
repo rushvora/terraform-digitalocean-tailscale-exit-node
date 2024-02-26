@@ -11,9 +11,9 @@ resource "digitalocean_ssh_key" "main" {
 # Create a new Droplet
 resource "digitalocean_droplet" "main" {
   image    = "debian-12-x64"
-  name     = "tailscale-xn-001"
+  name     = "do-ams3-ts"
   region   = "ams3"
-  size     = "s-1vcpu-1gb"
+  size     = "s-1vcpu-512mb-10gb"
   ssh_keys = [digitalocean_ssh_key.main.fingerprint]
   tags     = [digitalocean_tag.main.id]
 
@@ -80,4 +80,24 @@ resource "digitalocean_firewall" "tailscale" {
     protocol              = "icmp"
     destination_addresses = ["0.0.0.0/0", "::/0"]
   }
+}
+
+data "tailscale_device" "exit_node" {
+  depends_on = [
+    digitalocean_firewall.tailscale
+  ]
+
+  hostname = digitalocean_droplet.main.name
+}
+
+resource "tailscale_device_subnet_routes" "exit_node" {
+  depends_on = [
+    digitalocean_firewall.tailscale, data.tailscale_device.exit_node
+  ]
+
+  device_id = data.tailscale_device.exit_node.id
+  routes = [
+    "0.0.0.0/0",
+    "::/0"
+  ]
 }
