@@ -11,8 +11,8 @@ resource "digitalocean_ssh_key" "main" {
 # Create a new Droplet
 resource "digitalocean_droplet" "main" {
   image    = "debian-12-x64"
-  name     = "do-ams3-ts"
-  region   = "ams3"
+  name     = "do-nyc1-ts"
+  region   = "nyc1"
   size     = "s-1vcpu-512mb-10gb"
   ssh_keys = [digitalocean_ssh_key.main.fingerprint]
   tags     = [digitalocean_tag.main.id]
